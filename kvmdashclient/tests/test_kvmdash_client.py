@@ -1,4 +1,4 @@
-from kvmdash.contrib import kvmdash_client
+from kvmdashclient import kvmdash_client
 import pytest
 
 pytestmark = [pytest.mark.client]
