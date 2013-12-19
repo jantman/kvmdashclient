@@ -26,6 +26,12 @@ else:
 
 VERBOSE = False
 
+# fix for older libvirt-python versions
+try:
+    libvirt.VIR_DOMAIN_PMSUSPENDED
+except AttributeError:
+    libvirt.VIR_DOMAIN_PMSUSPENDED = 7
+
 DOM_STATES = {
     libvirt.VIR_DOMAIN_NOSTATE: 'no state',
     libvirt.VIR_DOMAIN_RUNNING: 'running',
