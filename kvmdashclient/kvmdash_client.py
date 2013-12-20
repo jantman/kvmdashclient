@@ -18,12 +18,6 @@ except ImportError:
     import json
     to_json = json.dumps
 
-if len(sys.argv) > 1:
-    hostname = sys.argv[1]
-else:
-    print("USAGE: test_libvirt.py <hostname> <...>")
-    sys.exit(1)
-
 VERBOSE = False
 
 # fix for older libvirt-python versions
@@ -184,48 +178,59 @@ def get_disk_free(image_paths, hostname=None):
         total_avail += int(avail)
     return total_avail
 
-hosts = sys.argv
-hosts.pop(0)
+def main():
 
-for h in hosts:
-    if h == "-v" or h == "--verbose":
-        VERBOSE = True
-        continue
+    if len(sys.argv) > 1:
+        hostname = sys.argv[1]
+    else:
+        print("USAGE: test_libvirt.py <hostname> <...>")
+        sys.exit(1)
 
-    uri = "qemu+ssh://%s/system" % h
+    hosts = sys.argv
+    hosts.pop(0)
 
-    try:
-        conn = libvirt.openReadOnly(uri)
-    except libvirt.libvirtError as e:
-        print("ERROR connecting to %s: %s" % (uri, e.message))
-        continue
+    for h in hosts:
+        if h == "-v" or h == "--verbose":
+            VERBOSE = True
+            continue
 
-    # some code examples imply that older versions
-    # returned None instead of raising an exception
-    if conn is None:
-        print("ERROR connecting to %s: %s" % (uri, e.message))
-        continue
+        uri = "qemu+ssh://%s/system" % h
 
-    host_info = get_host_info(conn)
+        try:
+            conn = libvirt.openReadOnly(uri)
+        except libvirt.libvirtError as e:
+            print("ERROR connecting to %s: %s" % (uri, e.message))
+            continue
 
-    doms = get_domains(conn)
+        # some code examples imply that older versions
+        # returned None instead of raising an exception
+        if conn is None:
+            print("ERROR connecting to %s: %s" % (uri, e.message))
+            continue
 
-    image_paths = []
-    for d in doms:
-        image_paths.extend(d['disk_files'])
+        host_info = get_host_info(conn)
 
-    df = get_disk_free(image_paths, h)
-    host_info['df_bytes'] = df
+        doms = get_domains(conn)
 
-    ts = int(time.time())
-    foo = {'type': 'host', 'name': host_info['hostname'], 'data': host_info, 'updated_ts': ts}
-    print to_json(foo)
-    with open("host_%s.json" % host_info['hostname'], 'w') as fh:
-        fh.write(to_json(foo))
+        image_paths = []
+        for d in doms:
+            image_paths.extend(d['disk_files'])
 
-    for d in doms:
-        #print("{host},{name},{ID},{state},{UUID}".format(host=h, name=d['name'], ID=d['ID'], UUID=d['UUID'], state=d['state']))
-        foo = {'type': 'guest', 'name': d['name'], 'uuid': d['UUID'], 'data': d, 'host': host_info['hostname'], 'updated_ts': ts}
+        df = get_disk_free(image_paths, h)
+        host_info['df_bytes'] = df
+
+        ts = int(time.time())
+        foo = {'type': 'host', 'name': host_info['hostname'], 'data': host_info, 'updated_ts': ts}
         print to_json(foo)
-        with open("host_%s_guest_%s.json" % (host_info['hostname'], d['name']), 'w') as fh:
+        with open("host_%s.json" % host_info['hostname'], 'w') as fh:
             fh.write(to_json(foo))
+
+        for d in doms:
+            #print("{host},{name},{ID},{state},{UUID}".format(host=h, name=d['name'], ID=d['ID'], UUID=d['UUID'], state=d['state']))
+            foo = {'type': 'guest', 'name': d['name'], 'uuid': d['UUID'], 'data': d, 'host': host_info['hostname'], 'updated_ts': ts}
+            print to_json(foo)
+            with open("host_%s_guest_%s.json" % (host_info['hostname'], d['name']), 'w') as fh:
+                fh.write(to_json(foo))
+
+if __name__ == "__main__":
+    main()
