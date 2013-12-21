@@ -2,6 +2,8 @@ import pytest
 import sys
 import os
 
+from libvirt import libvirtError
+
 from kvmdashclient import kvmdash_client
 
 
@@ -22,13 +24,6 @@ class TestIntegration():
                       'type': 'kvm',
                       'vcpus': 8}
 
-    class libvirtError(Exception):
-        message = "libvirtError message"
-        def __init__(self, value):
-            self.value = value
-        def __str__(self):
-            return repr(self.value)
-
     def test_everything_foo(self, monkeypatch):
         """
         As a precaution before doing any major work,
@@ -46,15 +41,12 @@ class TestIntegration():
 
     def test_get_domains_pre_0_9_13(self, monkeypatch):
         class mock_conn():
-            class libvirtError(Exception):
-                message = "libvirtError message"
-                def __init__(self, value):
-                    self.value = value
-                def __str__(self):
-                    return repr(self.value)
 
             def listAllDomains(self, x):
-                raise self.libvirtError("api pre 0.9.13")
+                raise libvirtError("api pre 0.9.13")
+
+            def listDefinedDomains(self):
+                return ['foo', 'bar']
 
         #monkeypatch.setattr(kvmdash_client.libvirt, "listAllDomains", test_listAllDoamins)
         #monkeypatch.setattr(kvmdash_client.get_domains, "listAllDomains", test_listAllDoamins)
