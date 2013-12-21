@@ -22,6 +22,13 @@ class TestIntegration():
                       'type': 'kvm',
                       'vcpus': 8}
 
+    class libvirtError(Exception):
+        message = "libvirtError message"
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+
     def test_everything_foo(self, monkeypatch):
         """
         As a precaution before doing any major work,
@@ -29,18 +36,31 @@ class TestIntegration():
         """
         monkeypatch.setattr(sys, "argv", ["kvmdash_client.py", "foo.example.com"])
 
-        class libvirtError(Exception):
-            message = "libvirtError message"
-            def __init__(self, value):
-                self.value = value
-            def __str__(self):
-                return repr(self.value)
-        monkeypatch.setattr(kvmdash_client.libvirt, "libvirtError", libvirtError)
-        def openReadOnly(foo):
-            return "foo"
-        monkeypatch.setattr(kvmdash_client.libvirt, "openReadOnly", openReadOnly)
+        #monkeypatch.setattr(kvmdash_client.libvirt, "libvirtError", libvirtError)
+        #def openReadOnly(foo):
+        #    return "foo"
+        #monkeypatch.setattr(kvmdash_client.libvirt, "openReadOnly", openReadOnly)
         # need to finish this...
         #result = kvmdash_client.main()
+        assert True == True
+
+    def test_get_domains_pre_0_9_13(self, monkeypatch):
+        class mock_conn():
+            class libvirtError(Exception):
+                message = "libvirtError message"
+                def __init__(self, value):
+                    self.value = value
+                def __str__(self):
+                    return repr(self.value)
+
+            def listAllDomains(self, x):
+                raise self.libvirtError("api pre 0.9.13")
+
+        #monkeypatch.setattr(kvmdash_client.libvirt, "listAllDomains", test_listAllDoamins)
+        #monkeypatch.setattr(kvmdash_client.get_domains, "listAllDomains", test_listAllDoamins)
+        conn = mock_conn()
+        foo = kvmdash_client.get_domains(conn)
+        assert foo == None
 
     def test_parse_domain_xml_foo(self):
         """
@@ -59,3 +79,11 @@ class TestIntegration():
             x = fh.read()
         res = kvmdash_client.parse_domain_xml(x)
         assert res == self.parsed_xml_bar
+
+    def test_bool(self):
+        assert kvmdash_client.bool("a") == True
+        assert kvmdash_client.bool(2) == True
+        assert kvmdash_client.bool({'foo': 'bar'}) == True
+        assert kvmdash_client.bool(0) == False
+        assert kvmdash_client.bool(False) == False
+        assert kvmdash_client.bool(True) == True
