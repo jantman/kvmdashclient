@@ -7,7 +7,6 @@ information about libvirt (qemu/KVM) guests.
 
 import libvirt
 import sys
-import libxml2
 from lxml import etree
 import subprocess
 import time
@@ -53,41 +52,6 @@ def xml_get(ctx, path):
     return res[0].content
 
 def parse_domain_xml(x):
-    """
-    Parse relevant information from domain XML.
-    """
-    ret = {}
-    doc = libxml2.parseDoc(x)
-    ctx = doc.xpathNewContext()
-
-    ret['type'] = xml_get(ctx, "/domain/@type")
-    memory = int(xml_get(ctx, "/domain/memory"))
-    memory_units = xml_get(ctx, "/domain/memory/@unit")
-    if memory_units == 'KiB':
-        memory = memory * 1024
-    ret['memory_bytes'] = memory
-    vcpu = xml_get(ctx, "/domain/vcpu")
-    ret['vcpus'] = int(vcpu)
-
-    disk_files = []
-    bridges = []
-
-    devs = ctx.xpathEval("/domain/devices/*")
-    for d in devs:
-        ctx.setContextNode(d)
-        type = xml_get(ctx, "@type")
-        if type == "file":
-            disk_files.append(xml_get(ctx, "source/@file"))
-        elif type == "bridge":
-            foo = {}
-            foo['mac'] = xml_get(ctx, "mac/@address")
-            foo['model'] = xml_get(ctx, "model/@type")
-            bridges.append(foo)
-    ret['bridges'] = bridges
-    ret['disk_files'] = disk_files
-    return ret
-
-def parse_domain_lxml(x):
     """
     Parse relevant information from domain XML.
     """

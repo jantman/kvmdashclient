@@ -50,7 +50,6 @@ class TestIntegration():
             x = fh.read()
         res = kvmdash_client.parse_domain_xml(x)
         assert res == self.parsed_xml_foo
-        assert self.parsed_xml_foo == kvmdash_client.parse_domain_lxml(x)
 
     def test_parse_domain_xml_bar(self):
         """
@@ -60,4 +59,3 @@ class TestIntegration():
             x = fh.read()
         res = kvmdash_client.parse_domain_xml(x)
         assert res == self.parsed_xml_bar
-        assert self.parsed_xml_bar == kvmdash_client.parse_domain_lxml(x)
