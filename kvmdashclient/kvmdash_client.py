@@ -45,12 +45,6 @@ def bool(a):
         return False
     return True
 
-def xml_get(ctx, path):
-    res = ctx.xpathEval(path)
-    if res is None or len(res) == 0:
-        return None
-    return res[0].content
-
 def parse_domain_xml(x):
     """
     Parse relevant information from domain XML.
