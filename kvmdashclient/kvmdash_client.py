@@ -8,6 +8,7 @@ information about libvirt (qemu/KVM) guests.
 import libvirt
 import sys
 import libxml2
+from lxml import etree
 import subprocess
 import time
 
@@ -81,6 +82,41 @@ def parse_domain_xml(x):
             foo = {}
             foo['mac'] = xml_get(ctx, "mac/@address")
             foo['model'] = xml_get(ctx, "model/@type")
+            bridges.append(foo)
+    ret['bridges'] = bridges
+    ret['disk_files'] = disk_files
+    return ret
+
+def parse_domain_lxml(x):
+    """
+    Parse relevant information from domain XML.
+    """
+    ret = {}
+    root = etree.fromstring(x)
+
+    ret['type'] = root.xpath("/domain/@type")[0]
+    memory = int(root.xpath("/domain/memory")[0].text)
+    memory_units = root.xpath("/domain/memory/@unit")[0]
+    if memory_units == 'KiB':
+        memory = memory * 1024
+    ret['memory_bytes'] = memory
+    ret['vcpus'] = int(root.xpath("/domain/vcpu")[0].text)
+
+    disk_files = []
+    bridges = []
+
+    devs = root.xpath("/domain/devices/*")
+    for d in devs:
+        if d.tag == 'disk' and 'type' in d.attrib and d.attrib['type'] == 'file':
+            disk_files.append(d.xpath("source/@file")[0])
+        if d.tag == 'interface' and 'type' in d.attrib and d.attrib['type'] == 'bridge':
+            foo = {'mac': None, 'model': None}
+            mac = d.xpath("mac/@address")
+            if len(mac) > 0:
+                foo['mac'] = mac[0]
+            model = d.xpath("model/@type")
+            if len(model) > 0:
+                foo['model'] = model[0]
             bridges.append(foo)
     ret['bridges'] = bridges
     ret['disk_files'] = disk_files
