@@ -1,8 +1,13 @@
-from kvmdash.contrib import kvmdash_client
+from kvmdashclient import kvmdash_client
 import pytest
 
-pytestmark = [pytest.mark.client]
+class TestIntegration():
 
-def test_foo():
-    foo = 1
-    assert foo == "not implemented yet"
+
+    def test_everything(self, monkeypatch):
+        """
+        As a precaution before doing any major work,
+        a high-level integration test
+        """
+        monkeypatch.setattr(sys, "argv", ["myhostname"])
+        
