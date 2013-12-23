@@ -108,7 +108,11 @@ def get_domains(conn):
             foo = conn.lookupByID(i)
             domains.append(foo)
     ret = []
+    print domains
+    print type(domains)
     for d in domains:
+        print d
+        print type(d)
         foo = {}
         foo['name'] = d.name()
         foo['ID'] = d.ID()

@@ -40,13 +40,29 @@ class TestIntegration():
         assert True == True
 
     def test_get_domains_pre_0_9_13(self, monkeypatch):
+        class mock_domain():
+            def name(self):
+                return self._name
+
+            def __init__(self, name):
+                self._name = name
+
         class mock_conn():
 
             def listAllDomains(self, x):
                 raise libvirtError("api pre 0.9.13")
 
             def listDefinedDomains(self):
-                return ['foo', 'bar']
+                return ['foo.example.com', 'bar.example.com']
+
+            def listDomainsID(self):
+                return [3]
+
+            def lookupByID(self, ID):
+                return mock_domain("baz.example.com")
+
+            def lookupByName(self, name):
+                return mock_domain(name)
 
         #monkeypatch.setattr(kvmdash_client.libvirt, "listAllDomains", test_listAllDoamins)
         #monkeypatch.setattr(kvmdash_client.get_domains, "listAllDomains", test_listAllDoamins)
