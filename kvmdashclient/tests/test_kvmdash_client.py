@@ -2,7 +2,7 @@ import pytest
 import sys
 import os
 
-from libvirt import libvirtError
+from libvirt import libvirtError, VIR_DOMAIN_RUNNING, VIR_DOMAIN_SHUTOFF
 
 from kvmdashclient import kvmdash_client
 
@@ -44,8 +44,39 @@ class TestIntegration():
             def name(self):
                 return self._name
 
+            def ID(self):
+                return self._ID
+
+            def UUIDString(self):
+                return self._UUID
+
+            def info(self):
+                return self._info
+
+            def XMLDesc(self, foo):
+                s = ""
+                with open('kvmdashclient/tests/fixtures/%s.xml' % self._name, 'r') as fh:
+                    s = fh.read()
+                return s
+
             def __init__(self, name):
                 self._name = name
+                if self.name == 'foo.example.com':
+                    self._ID = 6
+                    self._UUID = 'e7e6d19f-fcb8-6286-264c-26add934f909'
+                    self._info = (VIR_DOMAIN_RUNNING, 8388608, 8388608, 1, 1)
+                elif self.name == "bar.example.com":
+                    self._ID = 5
+                    self._UUID = '90492313-3b91-7a44-4241-6c0e4653fd5f'
+                    self._info = (VIR_DOMAIN_RUNNING, 89388608, 89388608, 8, 1)
+                elif self.name == 'baz.example.com':
+                    self._ID = 4
+                    self._UUID = '96ca7f69-2a51-f3d0-a2f7-248eeca371d0'
+                    self._info = (VIR_DOMAIN_SHUTOFF, 8388608, 8388608, 1, 1)
+                else:
+                    self._ID = 0
+                    self._UUID = ''
+                    self._info = (VIR_DOMAIN_SHUTOFF, 2, 2, 1, 1)
 
         class mock_conn():
 
