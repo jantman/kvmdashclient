@@ -1,0 +1,15 @@
+{
+    "ID": 6,
+    "bridges": [
+        {
+            "mac": "00:16:3e:75:ba:ae",
+            "model": null
+        }
+    ],
+    "disk_files": [
+        "/var/lib/libvirt/images/foo.example.com-disk0"
+    ],
+    "memory_bytes": 8589934592,
+    "type": "kvm",
+    "vcpus": 1
+}

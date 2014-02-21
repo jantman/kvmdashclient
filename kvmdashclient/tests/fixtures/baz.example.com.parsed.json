@@ -1,0 +1,13 @@
+{
+    "bridges": [
+        {
+            "mac": "00:16:3e:4f:52:45"
+        }
+    ],
+    "disk_files": [
+        "/var/lib/libvirt/images/baz.example.com-disk0"
+    ],
+    "memory_bytes": 8589934592,
+    "type": "kvm",
+    "vcpus": 1
+}

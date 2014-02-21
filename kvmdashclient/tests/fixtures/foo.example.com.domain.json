@@ -1,0 +1,18 @@
+{
+    "ID": 6,
+    "bridges": [
+        {
+            "mac": "00:16:3e:75:ba:ae",
+            "model": null
+        }
+    ],
+    "disk_files": [
+        "/var/lib/libvirt/images/foo.example.com-disk0"
+    ],
+    "memory_bytes": 8589934592,
+    "type": "kvm",
+    "vcpus": 1,
+    "UUID": "E7E6D19F-FCB8-6286-264C-26ADD934F909",
+    "name": "foo.example.com",
+    "state": "running"
+}

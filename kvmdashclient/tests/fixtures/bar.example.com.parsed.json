@@ -1,0 +1,14 @@
+{
+    "bridges": [
+        {
+            "mac": "52:54:00:e6:6b:60",
+            "model": "virtio"
+        }
+    ],
+    "disk_files": [
+        "/var/lib/libvirt/images/bar.example.com-disk0"
+    ],
+    "memory_bytes": 91533934592,
+    "type": "kvm",
+    "vcpus": 8
+}

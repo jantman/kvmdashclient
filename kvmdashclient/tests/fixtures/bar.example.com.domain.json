@@ -1,0 +1,18 @@
+{
+    "ID": 5,
+    "bridges": [
+        {
+            "mac": "52:54:00:e6:6b:60",
+            "model": "virtio"
+        }
+    ],
+    "disk_files": [
+        "/var/lib/libvirt/images/bar.example.com-disk0"
+    ],
+    "memory_bytes": 91533934592,
+    "type": "kvm",
+    "vcpus": 8,
+    "UUID": "90492313-3B91-7A44-4241-6C0E4653FD5F",
+    "name": "bar.example.com",
+    "state": "running"
+}
