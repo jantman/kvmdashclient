@@ -1,5 +1,6 @@
 import pytest
 from mock import MagicMock
+from pretend import stub
 
 import sys
 import os
