@@ -71,14 +71,15 @@ class TestIntegration():
                     self._info = (VIR_DOMAIN_SHUTOFF, 2, 2, 1, 1)
 
         conn = MagicMock()
-        conn.listDomainsID.return_value = [3]
+        #conn.listDomainsID.return_value = [3]
         conn.listDefinedDomains.return_value = ['foo.example.com', 'bar.example.com']
         conn.listAllDomains.side_effect = libvirtError("api pre 0.9.13")
         conn.lookupByID.side_effect = mock_domain
         conn.lookupByName.side_effect = mock_domain
 
         expected = []
-        for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
+        #for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
+        for n in ['foo.example.com', 'bar.example.com']:
             expected.append(load_test_json('%s.domain.json' % n))
         result = kvmdash_client.get_domains(conn)
         assert result == expected
