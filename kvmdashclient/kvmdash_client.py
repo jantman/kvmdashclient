@@ -40,11 +40,6 @@ DOM_STATES = {
 # bitwise or of all possible flags to virConnectListAllDomains
 ALL_OPTS = 16383
 
-def bool(a):
-    if a == 0:
-        return False
-    return True
-
 def parse_domain_xml(x):
     """
     Parse relevant information from domain XML.
