@@ -1,4 +1,4 @@
-<domain type='kvm' id='6'>
+<domain type='kvm' id='5'>
   <name>bar.example.com</name>
   <uuid>90492313-3b91-7a44-4241-6c0e4653fd5f</uuid>
   <memory unit='KiB'>89388608</memory>
