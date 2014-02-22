@@ -1,5 +1,5 @@
 {
-    "ID": 0,
+    "ID": -1,
     "bridges": [
         {
             "mac": "00:16:3e:4f:52:45",
@@ -13,6 +13,6 @@
     "type": "kvm",
     "vcpus": 1,
     "name": "baz.example.com",
-    "UUID": "",
-    "state": ""
+    "UUID": "96CA7F69-2A51-F3D0-A2F7-248EECA371D0",
+    "state": "shut off"
 }
