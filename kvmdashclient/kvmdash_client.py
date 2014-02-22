@@ -48,6 +48,11 @@ def parse_domain_xml(x):
     root = etree.fromstring(x)
 
     ret['type'] = root.xpath("/domain/@type")[0]
+    id_list = root.xpath("/domain/@id")
+    if len(id_list) > 0:
+        tmp_id = int(id_list[0])
+        if str(tmp_id) == id_list[0]:
+            ret['ID'] = tmp_id
     memory = int(root.xpath("/domain/memory")[0].text)
     memory_units = root.xpath("/domain/memory/@unit")[0]
     if memory_units == 'KiB':
