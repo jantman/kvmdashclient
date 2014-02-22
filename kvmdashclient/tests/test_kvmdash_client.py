@@ -129,7 +129,18 @@ class TestIntegration():
         for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
             expected.append(load_fixture_json_domain(n))
         result = kvmdash_client.get_domains(conn)
-        assert sorted(result) == sorted(expected)
+        """
+        # DEBUG - I wish pytest did deep pretty printing of diffs...
+        for i in xrange(0, len(result)):
+            print("###################### %s ######################" % i)
+            print result[i]
+            print expected[i]
+            for k in result[i]:
+                print("## %s:" % k)
+                print(result[i][k])
+                print(expected[i][k])
+        """
+        assert result.sort() == expected.sort()
 
 
     @pytest.mark.parametrize("dom_name", [
