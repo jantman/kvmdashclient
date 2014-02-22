@@ -128,12 +128,3 @@ class TestIntegration():
         parsed = load_test_json('bar.example.com.parsed.json')
         res = kvmdash_client.parse_domain_xml(x)
         assert res == parsed
-
-    def test_bool(self):
-        """ test kvmdash_client.bool() function """
-        assert kvmdash_client.bool("a") == True
-        assert kvmdash_client.bool(2) == True
-        assert kvmdash_client.bool({'foo': 'bar'}) == True
-        assert kvmdash_client.bool(0) == False
-        assert kvmdash_client.bool(False) == False
-        assert kvmdash_client.bool(True) == True
