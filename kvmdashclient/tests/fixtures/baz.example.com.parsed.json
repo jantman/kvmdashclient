@@ -1,7 +1,8 @@
 {
     "bridges": [
         {
-            "mac": "00:16:3e:4f:52:45"
+            "mac": "00:16:3e:4f:52:45",
+            "model": null
         }
     ],
     "disk_files": [

@@ -2,8 +2,7 @@
     "ID": -1,
     "bridges": [
         {
-            "mac": "00:16:3e:4f:52:45",
-            "model": null
+            "mac": "00:16:3e:4f:52:45"
         }
     ],
     "disk_files": [

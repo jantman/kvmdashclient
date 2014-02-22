@@ -13,15 +13,28 @@ from kvmdashclient import kvmdash_client
 """
 fixtures/:
  *.xml - domain XML exactly as returned by libvirt XMLDesc()
- *.parsed.json - JSON representation of the return value from kvmdash_client.parse_domain_xml() for the matching XML file
+ *.parsed.json - JSON representation of the return value of kvmdash_client.parse_domain_xml() for the matching XML file
+ *.domain.json - JSON representation of the dict representing the given domain in kvmdash_client.get_domains() return list
 
 """
 FIXTURE_DIR = 'kvmdashclient/tests/fixtures'
 
-def load_test_json(fname):
-    """read in a test JSON file from fixtures/, and make it ASCII"""
-    with open('%s/%s' % (FIXTURE_DIR, fname), 'r') as fh:
+def load_fixture_json_domain(dom_name):
+    """read in a test domain JSON file from fixtures/, and make it ASCII"""
+    with open('%s/%s.domain.json' % (FIXTURE_DIR, dom_name), 'r') as fh:
         foo = json.load(fh, encoding='ascii')
+    return foo
+
+def load_fixture_json_parsed(dom_name):
+    """read in a test parsed XML JSON file from fixtures/, and make it ASCII"""
+    with open('%s/%s.parsed.json' % (FIXTURE_DIR, dom_name), 'r') as fh:
+        foo = json.load(fh, encoding='ascii')
+    return foo
+
+def load_fixture_xml(dom_name):
+    """read in a test XML file from fixtures/, and make it ASCII"""
+    with open('%s/%s.xml' % (FIXTURE_DIR, dom_name), 'r') as fh:
+        foo = fh.read()
     return foo
 
 class mock_virDomain():
@@ -114,17 +127,21 @@ class TestIntegration():
 
         expected = []
         for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
-            expected.append(load_test_json('%s.domain.json' % n))
+            expected.append(load_fixture_json_domain(n))
         result = kvmdash_client.get_domains(conn)
         assert sorted(result) == sorted(expected)
 
-    # @TODO: test all available domain XML fixtures
-    def test_parse_domain_xml_bar(self):
+
+    @pytest.mark.parametrize("dom_name", [
+        'foo.example.com',
+        'bar.example.com',
+        'baz.example.com'
+    ])
+    def test_parse_domain_xml(self, dom_name):
         """
         test parsing domain xml
         """
-        with open('kvmdashclient/tests/fixtures/bar.example.com.xml', 'r') as fh:
-            x = fh.read()
-        parsed = load_test_json('bar.example.com.parsed.json')
+        x = load_fixture_xml(dom_name)
+        parsed = load_fixture_json_parsed(dom_name)
         res = kvmdash_client.parse_domain_xml(x)
         assert res == parsed
