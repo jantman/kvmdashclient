@@ -72,9 +72,8 @@ class TestIntegration():
     high-level integration tests
     """
 
-    # @TODO: this should be re-done as a patch/mock/stub/something better...
-    def test_get_domains_pre_0_9_13(self, monkeypatch):
-        """ test getting domains on pre 0.9.13 libvirt """
+    def test_get_domains_pre_0_9_13(self):
+        """ test getting domains (kvmdash_client.get_domains()) on pre 0.9.13 libvirt """
 
         conn = MagicMock()
         conn.listDomainsID.return_value = [5, 6]
@@ -129,6 +128,7 @@ class TestIntegration():
         for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
             expected.append(load_fixture_json_domain(n))
         result = kvmdash_client.get_domains(conn)
+        assert conn.listAllDomains.call_count == 1
         """
         # DEBUG - I wish pytest did deep pretty printing of diffs...
         for i in xrange(0, len(result)):
@@ -142,6 +142,38 @@ class TestIntegration():
         """
         assert result.sort() == expected.sort()
 
+    def test_get_domains_post_0_9_13(self):
+        """ test getting domains (kvmdash_client.get_domains()) on post-0.9.13 libvirt """
+
+        # we call conn.listAllDomains(16383), which
+        # returns a list of libvirt.virDomain instances
+
+        domain_objs = [ mock_virDomain(name='foo.example.com',
+                                       dom_id=6,
+                                       UUID='e7e6d19f-fcb8-6286-264c-26add934f909',
+                                       info=(VIR_DOMAIN_RUNNING, 8388608, 8388608, 1, 1)
+                                   ),
+                        mock_virDomain(name='bar.example.com',
+                                       dom_id=5,
+                                       UUID='90492313-3b91-7a44-4241-6c0e4653fd5f',
+                                       info=(VIR_DOMAIN_RUNNING, 89388608, 89388608, 8, 1)
+                                   ),
+                        mock_virDomain(name='baz.example.com',
+                                       dom_id=-1, # stopped, so ID is -1
+                                       UUID='96ca7f69-2a51-f3d0-a2f7-248eeca371d0',
+                                       info=(VIR_DOMAIN_SHUTOFF, 8388608, 8388608, 1, 1)
+                                   ),
+                        ]
+
+        conn = MagicMock()
+        conn.listAllDomains.return_value = domain_objs
+
+        expected = []
+        for n in ['foo.example.com', 'bar.example.com', 'baz.example.com']:
+            expected.append(load_fixture_json_domain(n))
+        result = kvmdash_client.get_domains(conn)
+        assert conn.listAllDomains.call_count == 1
+        assert result.sort() == expected.sort()
 
     @pytest.mark.parametrize("dom_name", [
         'foo.example.com',
@@ -156,3 +188,22 @@ class TestIntegration():
         parsed = load_fixture_json_parsed(dom_name)
         res = kvmdash_client.parse_domain_xml(x)
         assert res == parsed
+
+    def test_get_host_info(self, monkeypatch):
+        """ test kvmdash_client.get_host_info() """
+        conn = MagicMock()
+        conn.getHostname.return_value = 'my.host.name'
+        # http://libvirt.org/html/libvirt-libvirt.html#virNodeInfo
+        conn.getInfo.return_value = ('', 100, '', '', '', '', '', '')
+        conn.getMaxVcpus.return_value = 24
+
+        expected = {}
+        expected['maxvcpus'] = 24
+        expected['memory_bytes'] = 104857600
+        expected['hostname'] = 'my.host.name'
+
+        res = kvmdash_client.get_host_info(conn)
+        assert conn.getHostname.call_count == 1
+        assert conn.getInfo.call_count == 1
+        assert conn.getMaxVcpus.call_count == 1
+        assert res == expected
